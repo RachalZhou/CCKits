@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "CCKit"
-  spec.version      = "0.0.1"
+  spec.version      = "0.0.2"
   spec.summary      = "Public libs."
   spec.description  = "A collection of public libs"
   spec.homepage     = "https://github.com/RachalZhou/CCKit"
