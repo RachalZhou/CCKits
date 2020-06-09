@@ -8,17 +8,23 @@
 import UIKit
 import SnapKit
 
-protocol BannerViewDataSource: AnyObject {
+public protocol BannerViewDataSource: AnyObject {
     func numberOfBanners(_ bannerView: BannerView) -> Int
     func viewForBanner(_ bannView: BannerView, index: Int, convertView: UIView?) -> UIView
 }
 
-protocol BannerViewDelegate: AnyObject {
+public protocol BannerViewDelegate: AnyObject {
     func didSelectBanner(_ bannerView: BannerView, index: Int)
 }
 
+public enum Position {
+    case left
+    case center
+    case right
+}
+
 /// 纯Swift Banner组件（支持手动和自动的滚动方式）
-class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+public class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     private static var convertViewTag = 911128
     private static var cellId = "bannerViewCellId"
@@ -29,11 +35,6 @@ class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, 
     private var timer: Timer?
     public var isInfinite: Bool = true
     
-    enum Position {
-        case left
-        case center
-        case right
-    }
     public var pageControlPosition: Position = .center {
         didSet {
             pageControl.snp.remakeConstraints { (make) in
@@ -49,7 +50,7 @@ class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, 
         }
     }
     
-    weak var dataSource: BannerViewDataSource! {
+    public weak var dataSource: BannerViewDataSource! {
         didSet {
             pageControl.numberOfPages = dataSource.numberOfBanners(self)
             collectionView.reloadData()
@@ -61,7 +62,7 @@ class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, 
             }
         }
     }
-    weak var delegate: BannerViewDelegate?
+    public weak var delegate: BannerViewDelegate?
     
     public var autoScrollInterval = 2 {
         didSet {
@@ -69,8 +70,8 @@ class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, 
         }
     }
     
-    //MARK: life cycle
-    override init(frame: CGRect) {
+    // MARK: - life cycle
+    public override init(frame: CGRect) {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.minimumLineSpacing = 0
         flowLayout.minimumInteritemSpacing = 0
@@ -108,12 +109,12 @@ class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, 
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: UICollectionViewDataSource
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
+    // MARK: - UICollectionViewDataSource
+    public func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let count = dataSource.numberOfBanners(self)
         if isInfinite {
             if count == 1 {
@@ -126,7 +127,7 @@ class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, 
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BannerView.cellId, for: indexPath)
         let index = indexForItem(indexPath.row)
         
@@ -143,24 +144,24 @@ class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, 
         return cell
     }
     
-    //MARK: UICollectionViewDelegate
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    // MARK: - UICollectionViewDelegate
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let index = indexForItem(indexPath.row)
         delegate?.didSelectBanner(self, index: index)
     }
     
-    //MARK: UICollectionViewDelegateFlowLayout
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    // MARK: - UICollectionViewDelegateFlowLayout
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return self.bounds.size
     }
     
-    //MARK: UIScrollViewDelegate
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    // MARK: - UIScrollViewDelegate
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let current = Int(round(collectionView.contentOffset.x / collectionView.frame.width))
         pageControl.currentPage = indexForItem(current)
     }
     
-    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         let total = dataSource.numberOfBanners(self)
         let current = Int(round(collectionView.contentOffset.x / collectionView.frame.width))
         
@@ -173,16 +174,16 @@ class BannerView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, 
         }
     }
     
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         stopAutoScroll()
         scrollViewDidEndScrollingAnimation(scrollView)
     }
 
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         startAutoScroll()
     }
     
-    //MARK: private method
+    // MARK: - private method
     private func startAutoScroll() {
         guard autoScrollInterval > 0 && timer == nil else {
             return

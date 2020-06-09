@@ -9,19 +9,19 @@ import UIKit
 import SnapKit
 import MJRefresh
 
-class CommonCell<ItemType>: UITableViewCell {
-    public var item: ItemType?
+open class CommonCell<ItemType>: UITableViewCell {
+    open var item: ItemType?
     
-    required override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    public required override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
 
-protocol CommonListDelegate: AnyObject {
+public protocol CommonListDelegate: AnyObject {
     func didSelectItem<Item>(_ item: Item)
     func pullHeaderToRefresh(_ endHandler: () -> Void)
     func pullFooterToLoadMore(_ endHandler: () -> Void, _ noMoreHandler: () -> Void)
@@ -35,7 +35,7 @@ extension CommonListDelegate {
 }
 
 /// 支持泛型的通用列表组件（已支持下拉刷新和上拉加载）
-class CommonList<ItemType, CellType: CommonCell<ItemType>>: UIView, UITableViewDataSource, UITableViewDelegate {
+public class CommonList<ItemType, CellType: CommonCell<ItemType>>: UIView, UITableViewDataSource, UITableViewDelegate {
     
     private var tableView: UITableView
     
@@ -51,7 +51,7 @@ class CommonList<ItemType, CellType: CommonCell<ItemType>>: UIView, UITableViewD
         }
     }
     
-    weak var delegate: CommonListDelegate?
+    public weak var delegate: CommonListDelegate?
     
     public var needHeaderRefresh: Bool = false {
         didSet {
@@ -71,8 +71,8 @@ class CommonList<ItemType, CellType: CommonCell<ItemType>>: UIView, UITableViewD
         }
     }
     
-    //MARK: life cycle
-    override init(frame: CGRect) {
+    // MARK: - life cycle
+    public override init(frame: CGRect) {
         tableView = UITableView(frame: .zero, style: .plain)
         super.init(frame: frame)
         
@@ -89,12 +89,12 @@ class CommonList<ItemType, CellType: CommonCell<ItemType>>: UIView, UITableViewD
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: TableViewDataSource
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    // MARK: - TableViewDataSource
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell: CellType? = tableView.dequeueReusableCell(withIdentifier: "cellId") as? CellType
         if cell == nil {
             cell = CellType(style: .subtitle, reuseIdentifier: "cellId")
@@ -103,17 +103,17 @@ class CommonList<ItemType, CellType: CommonCell<ItemType>>: UIView, UITableViewD
         return cell!
     }
     
-    //MARK: TableViewDelegate
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    // MARK: - TableViewDelegate
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return cellHeight
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         delegate?.didSelectItem(items[indexPath.row])
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    //MARK: private method
+    // MARK: - private method
     @objc private func refreshHeader() {
         delegate?.pullHeaderToRefresh({
             self.tableView.reloadData()
